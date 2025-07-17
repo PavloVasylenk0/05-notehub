@@ -1,7 +1,7 @@
 import css from "./NoteList.module.css";
 import type { Note } from "../../types/note";
 import { deleteNote } from "../../services/noteService";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface NoteListProps {
   notes: Note[];
@@ -10,14 +10,18 @@ interface NoteListProps {
 export default function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
-  const handleDelete = async (id: string) => {
-    console.log("Deleting note with ID:", id);
-    try {
-      await deleteNote(id);
+  const { mutate: deleteNoteMutate, isPending } = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to delete note:", error);
-    }
+    },
+  });
+
+  const handleDelete = (id: string) => {
+    deleteNoteMutate(id);
   };
 
   if (!notes?.length) return null;
@@ -32,9 +36,10 @@ export default function NoteList({ notes }: NoteListProps) {
             <span className={css.tag}>{note.tag}</span>
             <button
               className={css.button}
-              onClick={() => handleDelete(note.id)}
+              onClick={() => handleDelete(note.id.toString ())}
+              disabled={isPending}
             >
-              Delete
+              {isPending ? "Deleting..." : "Delete"}
             </button>
           </div>
         </li>

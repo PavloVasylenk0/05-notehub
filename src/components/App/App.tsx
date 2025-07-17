@@ -21,6 +21,7 @@ export default function App() {
     queryKey: ["notes", page, debouncedSearch],
     queryFn: () =>
       fetchNotes({ page, perPage: PER_PAGE, search: debouncedSearch }),
+    placeholderData: (previousData) => previousData,
   });
 
   return (

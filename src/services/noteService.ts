@@ -38,7 +38,7 @@ export const fetchNotes = async ({
   if (search) params.append("search", search);
   if (tag) params.append("tag", tag);
 
-  const response = await instance.get("/notes", { params });
+  const response = await instance.get<FetchNotesResponse>("/notes", { params });
   return response.data;
 };
 
@@ -49,11 +49,11 @@ export interface CreateNoteParams {
 }
 
 export const createNote = async (noteData: CreateNoteParams): Promise<Note> => {
-  const response = await instance.post("/notes", noteData);
+  const response = await instance.post<Note>("/notes", noteData);
   return response.data;
 };
 
 export const deleteNote = async (id: string): Promise<Note> => {
-  const response = await instance.delete(`/notes/${id}`);
+  const response = await instance.delete<Note>(`/notes/${id}`);
   return response.data;
 };
